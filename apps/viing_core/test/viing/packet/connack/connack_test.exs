@@ -5,7 +5,7 @@ defmodule Viing.Packet.ConnackTest do
   alias Viing.Encoding.Encodable
 
   describe "encode/1" do
-    test "return correct encoding" do
+    test "return encoded packet" do
       variable_header = %Connack.VariableHeader{
         session_present?: false,
         status: 0x00
