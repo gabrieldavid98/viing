@@ -7,9 +7,8 @@ end
 
 defimpl Viing.Encoding.Decodable, for: BitString do
   alias Viing.Packet
-  alias Viing.Packet.Connect
 
-  def decode(<<1::4, _::4, _::binary>> = data), do: Connect.decode(data)
+  def decode(<<1::4, _::4, _::binary>> = data), do: Packet.Connect.decode(data)
   def decode(<<3::4, _::4, _::binary>> = data), do: {:publish, data}
   def decode(<<4::4, _::4, _::binary>> = data), do: {:buback, data}
   def decode(<<5::4, _::4, _::binary>> = data), do: {:pubrec, data}

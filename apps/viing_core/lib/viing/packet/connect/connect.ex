@@ -2,19 +2,16 @@ defmodule Viing.Packet.Connect do
   @moduledoc false
 
   alias Viing.Packet
-  alias Viing.Packet.Meta
-  alias Viing.Packet.Connect.VariableHeader
-  alias Viing.Packet.Connect.Payload
 
   @opcode 1
 
   @type t :: %__MODULE__{
-          __META__: Meta.t(),
-          variable_header: VariableHeader.t(),
-          payload: Payload.t() | nil
+          __META__: Packet.Meta.t(),
+          variable_header: Packet.Connect.VariableHeader.t(),
+          payload: Packet.Connect.Payload.t() | nil
         }
-  defstruct __META__: %Meta{opcode: @opcode},
-            variable_header: %VariableHeader{},
+  defstruct __META__: %Packet.Meta{opcode: @opcode},
+            variable_header: %Packet.Connect.VariableHeader{},
             payload: nil
 
   @spec decode(nonempty_binary()) ::
@@ -22,8 +19,8 @@ defmodule Viing.Packet.Connect do
           | {:ok, Viing.Packet.Connect.t()}
   def decode(<<@opcode::4, 0::4, payload::binary>>) do
     with {:ok, rest} <- Packet.drop_length(payload),
-         {:ok, variable_header, rest} <- VariableHeader.decode(rest),
-         {:ok, payload} <- Payload.decode(variable_header, rest) do
+         {:ok, variable_header, rest} <- Packet.Connect.VariableHeader.decode(rest),
+         {:ok, payload} <- Packet.Connect.Payload.decode(variable_header, rest) do
       {
         :ok,
         %__MODULE__{
