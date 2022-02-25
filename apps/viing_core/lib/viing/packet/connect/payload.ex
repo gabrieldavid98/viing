@@ -2,7 +2,6 @@ defmodule Viing.Packet.Connect.Payload do
   @moduledoc false
 
   alias Viing.Packet
-  alias Viing.Packet.Connect.VariableHeader
 
   @type t :: %__MODULE__{
           client_id: binary(),
@@ -16,7 +15,7 @@ defmodule Viing.Packet.Connect.Payload do
 
   @spec decode(Viing.Packet.Connect.VariableHeader.t(), binary()) ::
           {:error, :malformed_packet_error} | {:ok, Viing.Packet.Connect.Payload.t()}
-  def decode(%VariableHeader{} = variable_header, packet) do
+  def decode(%Packet.Connect.VariableHeader{} = variable_header, packet) do
     with <<length::big-integer-size(16), rest::binary>> <- packet,
          <<client_id::binary-size(length), rest::binary>> <- rest do
       decode_internal(variable_header, %__MODULE__{client_id: client_id}, rest)
@@ -26,7 +25,7 @@ defmodule Viing.Packet.Connect.Payload do
   end
 
   defp decode_internal(
-         %VariableHeader{user_name?: true} = variable_header,
+         %Packet.Connect.VariableHeader{user_name?: true} = variable_header,
          %__MODULE__{} = payload,
          packet
        ) do
@@ -43,7 +42,7 @@ defmodule Viing.Packet.Connect.Payload do
   end
 
   defp decode_internal(
-         %VariableHeader{password?: true} = variable_header,
+         %Packet.Connect.VariableHeader{password?: true} = variable_header,
          %__MODULE__{} = payload,
          packet
        ) do
@@ -59,11 +58,19 @@ defmodule Viing.Packet.Connect.Payload do
     end
   end
 
-  defp decode_internal(%VariableHeader{} = _variable_header, %__MODULE__{} = payload, <<>>) do
+  defp decode_internal(
+         %Packet.Connect.VariableHeader{} = _variable_header,
+         %__MODULE__{} = payload,
+         <<>>
+       ) do
     {:ok, payload}
   end
 
-  defp decode_internal(%VariableHeader{} = _variable_header, %__MODULE__{} = _payload, packet)
+  defp decode_internal(
+         %Packet.Connect.VariableHeader{} = _variable_header,
+         %__MODULE__{} = _payload,
+         packet
+       )
        when byte_size(packet) > 0 do
     {:error, Packet.malformed_error()}
   end
